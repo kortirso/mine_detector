@@ -1,8 +1,10 @@
 #mines
     br
+    p= link_to 'Новая игра', root_path, class: 'btn btn-sm btn-primary'
+    p= "Количество мин - #{@game.mines_count}"
+    p#result
+    br
     - (1..10).reverse_each do |y|
         - ('a'..'j').each do |x|
             .square.unknown class="square-#{x}#{y}" data={x: "#{x}", y: "#{y}"}
         .clearfix
-    br
-    p#result

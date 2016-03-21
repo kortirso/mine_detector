@@ -14,7 +14,10 @@
 <% else %>
     $('#result').html('Результат - <%= @game.game_result %>');
     $('.square-<%= @cell_list[0][0] %>').removeClass('unknown');
-    <% if @cell_list[0][1] == 'mine' %>
-        $('.square-<%= @cell_list[0][0] %>').append('<%= image_tag "mine.png" %>');
+    <% if @game.game_result == 'Поражение' %>
+        <% @cell_list.each do |cell| %>
+            $('.square-<%= cell[0] %>').removeClass('unknown');
+            $('.square-<%= cell[0] %>').append('<%= image_tag "mine.png" %>');
+        <% end %>
     <% end %>
 <% end %>

@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
     def index
-        game = Game.build
+        @game = Game.build
     end
 
     def click

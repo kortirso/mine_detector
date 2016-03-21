@@ -55,7 +55,7 @@ class Cell < ActiveRecord::Base
             end
         else
             self.game.update(game_result: 'Поражение')
-            result.push([self.name, 'mine'])
+            self.game.cells.where(has_mine: true).each { |mine| result.push([mine.name, 'mine']) }
         end
         result
     end
