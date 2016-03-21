@@ -17,6 +17,7 @@
     <% if @game.game_result == 'Поражение' %>
         <% @cell_list.each do |cell| %>
             $('.square-<%= cell[0] %>').removeClass('unknown');
+            $('.square-<%= cell[0] %> img').remove();
             $('.square-<%= cell[0] %>').append('<%= image_tag "mine.png" %>');
         <% end %>
     <% end %>
