@@ -1,0 +1,8 @@
+#mines
+    br
+    - (1..10).reverse_each do |y|
+        - ('a'..'j').each do |x|
+            .square.unknown class="square-#{x}#{y}" data={x: "#{x}", y: "#{y}"}
+        .clearfix
+    br
+    p#result
