@@ -18,7 +18,7 @@ class Cell < ActiveRecord::Base
         if self.has_mine == false
                 result.push([self.name, self.around])
                 self.update(opened: true)
-            if self.around == 0
+            if self.around == 0 # если вокруг нет мин, то открыть все ячейки вокруг
                 x_params, y_params, empties = %w(a b c d e f g h i j), %w(1 2 3 4 5 6 7 8 9 10), []
                 x_index, y_index = x_params.index(self.x_param), y_params.index(self.y_param)
                 cell_list = self.game.cells
@@ -33,7 +33,7 @@ class Cell < ActiveRecord::Base
                         end
                     end
                 end
-                until empties == []
+                until empties == [] # если сохраняются нулевые ячейки, то снова проверить вокруг, повторять пока не останется пустых
                     checks = empties
                     empties = []
                     checks.each do |empty_name|
@@ -67,13 +67,11 @@ class Cell < ActiveRecord::Base
         cells = game.cells.where(has_mine: false)
         cells.each do |cell|
             around, x_index, y_index = 0, x_params.index(cell.x_param), y_params.index(cell.y_param)
-            [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].each do |i|
+            [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].each do |i| # проверка 8 ячеек вокруг
                 x_new, y_new = x_index + i[0], y_index + i[1]
                 if x_new >= 0 && x_new <= 9 && y_new >= 0 && y_new <= 9
                     cell_new = "#{x_params[x_new]}#{y_params[y_new]}"
-                    if mines.include?(cell_new)
-                        around += 1
-                    end
+                    around += 1 if mines.include?(cell_new) # если в список мин входит выбранная ячейка, то индикатор + 1
                 end
             end
             cell.update(around: around)

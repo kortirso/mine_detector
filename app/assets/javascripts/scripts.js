@@ -1,5 +1,6 @@
 $(function() {
     this.oncontextmenu = function() { return false; };
+    // левый клик
     $('#mines').on('click', '.square', function(e) {
         x = $(this).data('x');
         y = $(this).data('y');
@@ -7,6 +8,7 @@ $(function() {
         time = my_timer.innerHTML;
         if(time == '00:00:00') startTimer();
     })
+    // правый клик
     .on('mousedown', '.square', function(e) {
         if(e.which == 2 || e.which == 3) {
             x = $(this).data('x');
@@ -14,6 +16,7 @@ $(function() {
             $.post('http://localhost:3000/square/' + x + y + '/2');
         }
     });
+    // таймер
     function startTimer() {
         if($('#result').html() == '') {
             my_timer = document.getElementById('my_timer');

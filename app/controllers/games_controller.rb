@@ -32,6 +32,7 @@ class GamesController < ApplicationController
         @defeat_count = games.where(game_result: 'Поражение').count
     end
 
+    private
     def update_games
         games = current_user ? Game.where(user_id: current_user.id, game_result: 'none') : Game.where(guest: session[:guest], game_result: 'none')
         games.each { |game| game.update(game_result: 'Поражение') } if games.count > 0

@@ -6,8 +6,10 @@ html
         = javascript_include_tag 'application'
         = csrf_meta_tags
     body
+        / фоновое изображение
         .inside
             .shadow
+        / навигация
         = render 'layouts/nav'
         = render 'layouts/login_modal'
         = render 'layouts/sign_up_modal'
