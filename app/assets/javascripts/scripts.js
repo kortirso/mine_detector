@@ -1,9 +1,11 @@
 $(function() {
-    this.oncontextmenu = function() {return false;};
+    this.oncontextmenu = function() { return false; };
     $('#mines').on('click', '.square', function(e) {
         x = $(this).data('x');
         y = $(this).data('y');
         $.post('http://localhost:3000/square/' + x + y + '/1');
+        time = my_timer.innerHTML;
+        if(time == '00:00:00') startTimer();
     })
     .on('mousedown', '.square', function(e) {
         if(e.which == 2 || e.which == 3) {
@@ -12,4 +14,28 @@ $(function() {
             $.post('http://localhost:3000/square/' + x + y + '/2');
         }
     });
+    function startTimer() {
+        if($('#result').html() == '') {
+            my_timer = document.getElementById('my_timer');
+            time = my_timer.innerHTML;
+            arr = time.split(':');
+            h = arr[0];
+            m = arr[1];
+            s = arr[2];
+            if(s == 60) {
+                if(m == 60) {
+                    h++;
+                    if(h < 10) h = '0' + h;
+                    m = 0;
+                }
+                m++;
+                if(m < 10) m = '0' + m;
+                s = 0;
+            }
+            else s++;
+            if(s < 10) s = '0' + s;
+            document.getElementById("my_timer").innerHTML = h+':'+m+':'+s;
+            setTimeout(startTimer, 1000);
+        }
+    }
 });

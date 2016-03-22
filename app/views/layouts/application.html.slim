@@ -6,7 +6,11 @@ html
         = javascript_include_tag 'application'
         = csrf_meta_tags
     body
+        .inside
+            .shadow
+        = render 'layouts/nav'
+        = render 'layouts/login_modal'
+        = render 'layouts/sign_up_modal'
         .container
             .row
-                .col-xs-12
-                    = yield
+                = yield

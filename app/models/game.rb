@@ -1,10 +1,11 @@
 class Game < ActiveRecord::Base
+    belongs_to :user
     has_many :cells
 
     validates :game_result, inclusion: { in: %w(none Победа Поражение) }
 
-    def self.build
-        game = create start: false
+    def self.build(user_id)
+        game = user_id.is_a?(String) ? create(start: false, guest: user_id) : create(start: false, user_id: user_id)
         Cell.build(game.id)
         game.set_mines
         game

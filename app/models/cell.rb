@@ -54,7 +54,7 @@ class Cell < ActiveRecord::Base
                 end
             end
         else
-            self.game.update(game_result: 'Поражение')
+            self.game.update(game_result: 'Поражение', times: (Time.current.to_i - self.game.starttime))
             self.game.cells.where(has_mine: true).each { |mine| result.push([mine.name, 'mine']) }
         end
         result
