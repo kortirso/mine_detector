@@ -1,16 +1,19 @@
 default: &default
-  adapter: sqlite3
-  pool: 5
-  timeout: 5000
+  adapter: postgresql
+  pool: 20
+  port: 5432
+  username: <%= ENV['MINES_DATABASE_USERNAME'] %>
+  password: <%= ENV['MINES_DATABASE_PASSWORD'] %>
+  encoding: utf8
 
 development:
   <<: *default
-  database: db/development.sqlite3
+  database: mines_development
 
 test:
   <<: *default
-  database: db/test.sqlite3
+  database: mines_test
 
 production:
   <<: *default
-  database: db/production.sqlite3
+  database: mines_production
