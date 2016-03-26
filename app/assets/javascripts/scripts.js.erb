@@ -3,7 +3,7 @@ $(function() {
     $('#mines').on('click', '.square', function(e) {
         x = $(this).data('x');
         y = $(this).data('y');
-        $.post('http://localhost:3000/square/' + x + y + '/1');
+        $.post('<%= ENV['CURRENT_HOST'] %>/square/' + x + y + '/1');
         time = my_timer.innerHTML;
         if(time == '00:00:00') startTimer();
     })
@@ -11,7 +11,7 @@ $(function() {
         if(e.which == 2 || e.which == 3) {
             x = $(this).data('x');
             y = $(this).data('y');
-            $.post('http://localhost:3000/square/' + x + y + '/2');
+            $.post('<%= ENV['CURRENT_HOST'] %>/square/' + x + y + '/2');
         }
     });
     function startTimer() {
