@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
     before_action :authenticate_user!, only: :profile
-    before_action :update_games, except: :click
+    before_action :update_games, except: [:click, :champions]
 
     def index
         @game = Game.build(current_user ? current_user.id : session[:guest])
@@ -30,6 +30,10 @@ class GamesController < ApplicationController
         games = Game.where(user_id: current_user.id).order(times: :asc)
         @wins = games.where(game_result: 'Победа')
         @defeat_count = games.where(game_result: 'Поражение').count
+    end
+
+    def champions
+        @games = Game.where(game_result: 'Победа').order(times: :asc).limit(10)
     end
 
     private

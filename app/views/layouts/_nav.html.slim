@@ -8,12 +8,11 @@ nav.navbar.navbar-inverse.navbar-fixed-top role='navigation'
     .navbar-collapse.collapse
         ul.nav.navbar-nav
             li= link_to 'Новая игра', root_path
-            - if current_user
-                li= link_to 'Профиль', profile_path
+            li= link_to 'Чемпионы', champions_path
     .auth_box
         - if user_signed_in?
             span.hidden-xs
-                span= "Вы вошли как #{current_user.username}"
+                span.profile= link_to 'Профиль', profile_path
             = link_to 'Выход', destroy_user_session_path, method: :delete, class: 'btn btn-sm btn-danger', id: 'destroy'
         - else
             = link_to 'Регистрация', '#sign_up', 'data-toggle' => 'modal', id: 'up', class: 'btn btn-sm btn-success'

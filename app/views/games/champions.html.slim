@@ -1,0 +1,20 @@
+.col-xs-8
+    .table-block
+        table.table.table-striped
+            thead
+                tr
+                    td #
+                    td Сапёр
+                    td Количество мин
+                    td Время (секунд)
+            tbody
+                - @games.each do |game|
+                    tr
+                        td= game.id
+                        td
+                            - if game.user_id.nil?
+                                = 'Гость'
+                            - else
+                                = "#{game.user.username}"
+                        td= game.mines_count
+                        td= game.times

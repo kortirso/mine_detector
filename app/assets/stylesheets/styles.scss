@@ -53,12 +53,20 @@ body {
             position: absolute;
             right: 20px;
             top: 12px;
-            color: #AAA;
             span {
                 padding: 0 10px;
             }
             @media screen and (max-width: 750px) {
                 right: 70px;
+            }
+            .profile {
+                a {
+                    color: #777;
+                    &:hover {
+                        color: #FFF;
+                        text-decoration: none;
+                    }
+                }
             }
         }
     }

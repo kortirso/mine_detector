@@ -6,75 +6,70 @@ class Cell < ActiveRecord::Base
     validates :y_param, inclusion: { in: %w(1 2 3 4 5 6 7 8 9 10) }
 
     def self.build(game_id)
+        inserts, t = [], Time.current
         %w(a b c d e f g h i j).each do |x|
             %w(1 2 3 4 5 6 7 8 9 10).each do |y|
-                create game_id: game_id, x_param: x, y_param: y, name: "#{x}#{y}"
+                inserts.push "(#{game_id}, '#{x}', '#{y}', '#{x + y}', '#{t}', '#{t}')"
             end
         end
+        Cell.connection.execute "INSERT INTO cells (game_id, x_param, y_param, name, created_at, updated_at) VALUES #{inserts.join(", ")}"
     end
 
     def check_cell
-        result = []
+        @result = []
         if self.has_mine == false
-                result.push([self.name, self.around])
+                @result.push([self.name, self.around])
                 self.update(opened: true)
             if self.around == 0
-                x_params, y_params, empties = %w(a b c d e f g h i j), %w(1 2 3 4 5 6 7 8 9 10), []
-                x_index, y_index = x_params.index(self.x_param), y_params.index(self.y_param)
-                cell_list = self.game.cells
-                [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].each do |i|
-                    x_new, y_new = x_index + i[0], y_index + i[1]
-                    if x_new >= 0 && x_new <= 9 && y_new >= 0 && y_new <= 9
-                        cell_new = cell_list.find_by(name: "#{x_params[x_new]}#{y_params[y_new]}")
-                        unless cell_new.opened
-                            cell_new.update(opened: true)
-                            result.push([cell_new.name, cell_new.around])
-                            empties.push(cell_new.name) if cell_new.around == 0
-                        end
-                    end
-                end
-                until empties == []
-                    checks = empties
-                    empties = []
-                    checks.each do |empty_name|
-                        empty = cell_list.find_by(name: empty_name)
-                        x_index, y_index = x_params.index(empty.x_param), y_params.index(empty.y_param)
-                        [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].each do |i|
-                            x_new, y_new = x_index + i[0], y_index + i[1]
-                            if x_new >= 0 && x_new <= 9 && y_new >= 0 && y_new <= 9
-                                cell_new = cell_list.find_by(name: "#{x_params[x_new]}#{y_params[y_new]}")
-                                unless cell_new.opened
-                                    cell_new.update(opened: true)
-                                    result.push([cell_new.name, cell_new.around])
-                                    empties.push(cell_new.name) if cell_new.around == 0
-                                end
-                            end
-                        end
-                    end
+                @x_params, @y_params, @empties, @cell_list = %w(a b c d e f g h i j), %w(1 2 3 4 5 6 7 8 9 10), [], self.game.cells
+                open_cell(self)
+                until @empties == []
+                    checks = @empties
+                    @empties = []
+                    checks.each { |empty_name| open_cell(@cell_list.find_by(name: empty_name)) }
                 end
             end
         else
-            self.game.update(game_result: 'Поражение', times: (Time.current.to_i - self.game.starttime))
-            self.game.cells.where(has_mine: true).each { |mine| result.push([mine.name, 'mine']) }
+            current_game = self.game
+            current_game.update(game_result: 'Поражение', times: (Time.current.to_i - current_game.starttime))
+            current_game.cells.where(has_mine: true).each { |mine| @result.push([mine.name, 'mine']) }
         end
-        result
+        @result
+    end
+
+    def open_cell(object)
+        x_index, y_index = @x_params.index(object.x_param), @y_params.index(object.y_param)
+        [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].each do |i|
+            x_new, y_new = x_index + i[0], y_index + i[1]
+            if x_new >= 0 && x_new <= 9 && y_new >= 0 && y_new <= 9
+                cell_new = @cell_list.find_by(name: "#{@x_params[x_new]}#{@y_params[y_new]}")
+                unless cell_new.opened
+                    cell_new.update(opened: true)
+                    @result.push([cell_new.name, cell_new.around])
+                    @empties.push(cell_new.name) if cell_new.around == 0
+                end
+            end
+        end
     end
 
     def self.set_around(game_id)
-        x_params, y_params = %w(a b c d e f g h i j), %w(1 2 3 4 5 6 7 8 9 10)
-        game = Game.find(game_id)
-        mines = game.mines
-        cells = game.cells.where(has_mine: false)
-        cells.each do |cell|
-            around, x_index, y_index = 0, x_params.index(cell.x_param), y_params.index(cell.y_param)
+        x_params, y_params, around_list, result_list, game_cells = %w(a b c d e f g h i j), %w(1 2 3 4 5 6 7 8 9 10), [], [], Game.find(game_id).cells
+        game_cells.where(has_mine: true).each do |cell|
+            x_index, y_index = x_params.index(cell.x_param), y_params.index(cell.y_param)
             [[-1, -1], [-1, 0], [-1, 1], [0, -1], [0, 1], [1, -1], [1, 0], [1, 1]].each do |i|
                 x_new, y_new = x_index + i[0], y_index + i[1]
-                if x_new >= 0 && x_new <= 9 && y_new >= 0 && y_new <= 9
-                    cell_new = "#{x_params[x_new]}#{y_params[y_new]}"
-                    around += 1 if mines.include?(cell_new)
-                end
+                around_list.push("#{x_params[x_new]}#{y_params[y_new]}") if x_new >= 0 && x_new <= 9 && y_new >= 0 && y_new <= 9
             end
-            cell.update(around: around)
+        end
+        around_list.sort!.each do |cell|
+            if result_list == []
+                result_list.push([cell, 1])
+            else
+                result_list[-1][0] == cell ? result_list[-1][1] += 1 : result_list.push([cell, 1])
+            end
+        end
+        Cell.transaction do
+            result_list.each { |cell| game_cells.find_by(name: cell[0]).update(around: cell[1]) }
         end
     end
 
