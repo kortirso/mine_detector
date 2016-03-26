@@ -7,6 +7,19 @@
 
 html {
     overflow-y: scroll;
+    &::-webkit-scrollbar {
+        width: 6px;
+    }
+    &::-webkit-scrollbar-track {
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+    }
+    &::-webkit-scrollbar-thumb {
+        -webkit-border-radius: 6px;
+        border-radius: 6px;
+        background: rgba(217,217,217,0.8);
+        -webkit-box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+    }
 }
 
 html, body {
@@ -96,7 +109,7 @@ body {
     font-weight: bold;
 }
 
-#info_block {
+#info_block, #auth {
     padding: 20px;
     background: #FFF;
     border-radius: 5px;
