@@ -8,18 +8,22 @@ class GamesController < ApplicationController
 
     def click
         @game = current_user ? Game.where(user_id: current_user.id).last : Game.where(guest: session[:guest]).last
-        if @game.game_result == 'none'
+        if @game && @game.game_result == 'none'
             cell = @game.cells.find_by(name: "#{params[:name]}")
-            if cell.opened
-                render nothing: true
-            else
-                if cell.marked
-                    @cell_list = cell.marking(false)
+            if !cell.nil?
+                if cell.opened
+                    render nothing: true
                 else
-                    @cell_list = params[:click] == '1' ? cell.check_cell : (@cell_list = cell.marking(true))
+                    if cell.marked
+                        @cell_list = cell.marking(false)
+                    else
+                        @cell_list = params[:click] == '1' ? cell.check_cell : (@cell_list = cell.marking(true))
+                    end
+                    @game.update(starttime: Time.current.to_i) if @game.starttime == 0
+                    @game.update(game_result: 'Победа', times: (Time.current.to_i - @game.starttime)) if @game.cells.where(opened: false).count == @game.mines_count
                 end
-                @game.update(starttime: Time.current.to_i) if @game.starttime == 0
-                @game.update(game_result: 'Победа', times: (Time.current.to_i - @game.starttime)) if @game.cells.where(opened: false).count == @game.mines_count
+            else
+                render nothing: true
             end
         else
             render nothing: true
