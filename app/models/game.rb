@@ -2,7 +2,7 @@ class Game < ActiveRecord::Base
     belongs_to :user
     has_many :cells
 
-    validates :game_result, inclusion: { in: %w(none Победа Поражение) }
+    validates :game_result, presence: true, inclusion: { in: %w(none Победа Поражение) }
 
     def self.build(user_id)
         game = user_id.is_a?(String) ? create(guest: user_id) : create(user_id: user_id)
